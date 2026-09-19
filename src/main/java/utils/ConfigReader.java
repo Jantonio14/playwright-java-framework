@@ -24,6 +24,10 @@ public class ConfigReader {
     }
 
     public static String get(String key) {
+        String envValue = System.getenv(key);
+        if (envValue != null) {
+            return envValue;
+        }
         return properties.getProperty(key);
     }
 }
