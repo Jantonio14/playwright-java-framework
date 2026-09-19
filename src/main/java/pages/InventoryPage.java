@@ -9,7 +9,7 @@ public class InventoryPage extends BasePage {
 
     public InventoryPage(Page page) {
         super(page);
-        productsTitle = page.getByText("Products");
+        productsTitle = page.locator(".title");
     }
 
     public boolean isProductsTitleVisible() {
