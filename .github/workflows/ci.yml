@@ -1,0 +1,53 @@
+name: CI
+
+# Runs on every push and every PR targeting main — this is what will
+# let you gate merges on tests passing, once you turn on branch protection.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Pulls your repo's code into the CI runner's filesystem
+      - uses: actions/checkout@v4
+
+      # Sets up Java — match this version to whatever you're using locally
+      # (check your pom.xml <java.version> or run `java -version`)
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '22'
+          distribution: 'temurin'
+          cache: 'maven'   # caches ~/.m2 between runs so builds are faster
+
+      # Playwright needs its browser binaries installed separately from
+      # the Java dependency — this downloads Chromium (and deps) for CI.
+      # mvn exec:java runs Playwright's install CLI via its Maven plugin.
+      - name: Install Playwright browsers
+        run: mvn dependency:build-classpath -Dmdep.outputFile=cp.txt && java -cp "$(cat cp.txt):target/classes" com.microsoft.playwright.CLI install --with-deps chromium
+
+      # Option A: copy the example config so ConfigReader's static block
+      # finds a file to load. Since these are public SauceDemo values,
+      # this is safe to do in plain CI without secrets.
+      - name: Set up test config
+        run: cp src/test/resources/config.properties.example src/test/resources/config.properties
+
+      # Runs your test suite
+      - name: Run tests
+        run: mvn test
+
+      # Uploads the surefire report + any screenshots even if tests fail,
+      # so you can download and inspect what broke from the Actions UI.
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            target/surefire-reports/
+            screenshots/

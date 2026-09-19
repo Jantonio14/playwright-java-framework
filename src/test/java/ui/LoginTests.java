@@ -14,8 +14,8 @@ public class LoginTests extends BaseTest {
         LoginPage loginPage = new LoginPage(page);
         loginPage.open();
 
-        loginPage.enterUsername(ConfigReader.get("username"));
-        loginPage.enterPassword(ConfigReader.get("password"));
+        loginPage.enterUsername(ConfigReader.get("sauce.username"));
+        loginPage.enterPassword(ConfigReader.get("sauce.password"));
         loginPage.clickLogin();
 
         InventoryPage inventoryPage = new InventoryPage(page);
