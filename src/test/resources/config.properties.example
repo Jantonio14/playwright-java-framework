@@ -1,3 +1,4 @@
 base.url=https://www.saucedemo.com/
 sauce.username=standard_user
 sauce.password=secret_sauce
+api.base.url=https://restful-booker.herokuapp.com
